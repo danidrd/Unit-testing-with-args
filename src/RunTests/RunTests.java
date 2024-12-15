@@ -2,7 +2,7 @@ package RunTests;
 import Testable.*;
 import AdditionalCode.*;
 
-import java.io.File;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -11,10 +11,20 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.lang.annotation.*;
+
 
 public class RunTests {
 
+    /**
+     * Main entry point for running tests.
+     * Usage: java RunTests <className>
+     * where <className> is the name of the class containing the tests.
+     * The output of the tests is compared against a reference file
+     * "RunTests_<className>.output" and the result is printed to the console.
+     * The reference file is expected to be in the same package as the class
+     * being tested.
+     * @param args the command line arguments
+     */
     public static void main(String[] args) {
         if (args.length != 1) {
             System.out.println("Usage: java RunTests <className>");
@@ -65,6 +75,17 @@ public class RunTests {
             }
         }
     }
+    /**
+     * Runs a test method with the given arguments and expected result.
+     *
+     * The method is invoked with the parsed arguments and the result is compared
+     * with the expected result. If the result matches, the test is reported as
+     * succeeded, otherwise it is reported as failed.
+     *
+     * @param method the method to be tested
+     * @param instance the instance to be used for invoking the method
+     * @param spec the specification of the test
+     */
     private static void runTest(Method method, Object instance, Specification spec) {
         try {
             // Parsing degli argomenti
@@ -94,6 +115,20 @@ public class RunTests {
         }
     }
 
+    /**
+     * Parses an array of arguments given as strings into an array of objects.
+     * The types of the arguments are given as an array of strings, and the
+     * parser will attempt to parse each value as an argument of the specified
+     * type.
+     * <p>
+     * If the length of the types and values arrays do not match, or if the
+     * parsing fails for any argument, the method returns null.
+     * <p>
+     * Supported types are: int, double, bool, string.
+     * @param types the types of the arguments, given as an array of strings
+     * @param values the values of the arguments, given as an array of strings
+     * @return an array of object arguments, or null if the parsing fails
+     */
     private static Object[] parseArguments(String[] types, String[] values) {
         if (types.length != values.length) return null;
         try {
@@ -107,6 +142,16 @@ public class RunTests {
         }
     }
 
+    /**
+     * Parses a string value into an object of the specified type.
+     *
+     * Supported types are: int, double, bool, string.
+     *
+     * @param type the type to parse the value into, represented as a string
+     * @param value the string value to be parsed
+     * @return the parsed object corresponding to the given type, or null if the type is unsupported
+     * @throws NumberFormatException if the value cannot be parsed to the specified numeric type
+     */
     private static Object parseValue(String type, String value) {
         switch (type) {
             case "int": return Integer.parseInt(value);
@@ -117,6 +162,16 @@ public class RunTests {
         }
     }
 
+    /**
+     * Given a type name as a string, returns the corresponding class object.
+     * <p>
+     * Supported types are: int, double, bool, string.
+     * <p>
+     * If the type is not recognized, an {@link IllegalArgumentException} is thrown.
+     * @param type the type name as a string
+     * @return the corresponding class object
+     * @throws IllegalArgumentException if the type is not recognized
+     */
     private static Class<?> getClassForType(String type) {
         switch (type) {
             case "int": return Integer.class;
@@ -128,6 +183,14 @@ public class RunTests {
     }
 
 
+    /**
+     * Verifies if the given result matches the expected result, given as a string.
+     *
+     * @param result the object to be verified
+     * @param resType the type of the expected result as a string (e.g., "int", "double", "bool", "string")
+     * @param resVal the expected result as a string
+     * @return true if the result is null and expected value is empty, or if the result is equal to the expected value; false otherwise
+     */
     private static boolean verifyResult(Object result, String resType, String resVal) {
         if (result == null && resVal.isEmpty()) return true;
         if (result == null || resType.isEmpty()) return false;
@@ -139,12 +202,26 @@ public class RunTests {
         }
     }
 
+    /**
+     * Verifies if the given result's type matches the expected type.
+     *
+     * @param resType the expected type as a string (e.g., "int", "double", "bool", "string")
+     * @param result the object whose type is to be verified
+     * @return true if the result is null and expected type is empty, or if the result is an instance of the expected type; false otherwise
+     */
     private static boolean verifyType(String resType, Object result) {
         if(result == null && resType.isEmpty()) return true;
         return getClassForType(resType).isInstance(result);
     }
 
 
+    /**
+     * Compares the contents of two files, line by line.
+     * @param file1 the first file to compare
+     * @param file2 the second file to compare
+     * @return true if the files are equal, false otherwise
+     * @throws IOException if there is an error reading either file
+     */
     private static boolean compareFiles(String file1, String file2) throws IOException {
         List<String> file1Lines = Files.readAllLines(Path.of(file1));
         List<String> file2Lines = Files.readAllLines(Path.of(file2));
