@@ -24,8 +24,3 @@ The `RunTests` class is designed to automatically execute tests defined in a spe
 ### 5. **Temporary File Cleanup**
 - After execution, the temporary file is deleted to maintain a clean environment.
 
-## Example Usage
-To execute tests for a class, compile the necessary files and run the `RunTests` program:
-```bash
-javac RunTests.java MathOpsTests.java
-java RunTests MathOpsTests
